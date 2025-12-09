@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>gqcnn</name>
+  <version>1.3.0</version>
+  <description>ROS 2 package for deploying Grasp Quality CNNs.</description>
+
+  <maintainer email="vsatish@berkeley.edu">Vishal Satish</maintainer>
+  <license>Regents</license>
+
+  <!-- ROS 2 build tool -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Dependencies for message generation -->
+  <build_depend>rosidl_default_generators</build_depend>
+
+  <!-- Runtime dependencies -->
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <!-- Export build type and interface group -->
+  <export>
+    <build_type>ament_cmake</build_type>
+    <!-- <member_of_group>rosidl_interface_packages</member_of_group> -->
+  </export>
+</package>

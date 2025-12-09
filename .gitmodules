@@ -1,0 +1,10 @@
+
+[submodule "third_party/gqcnnn"]
+	path = third_party/gqcnnn
+	url = git@github.com:thdhyan/gqcnn
+[submodule "third_party/tro-graspD"]
+	path = third_party/tro-graspD
+	url = git@github.com:thdhyan/TRO-Grasp
+[submodule "third_party/tro-grasp"]
+	path = third_party/tro-grasp
+	url = git@github.com:thdhyan/TRO-Grasp

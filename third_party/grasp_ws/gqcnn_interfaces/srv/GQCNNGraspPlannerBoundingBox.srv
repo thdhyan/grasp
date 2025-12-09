@@ -1,0 +1,11 @@
+# GQCNNGraspPlannerBoundingBox service for grasp planning with ROI
+# Copyright BSD-3-Clause
+
+# Request
+sensor_msgs/Image color_image
+sensor_msgs/Image depth_image
+sensor_msgs/CameraInfo camera_info
+BoundingBox bounding_box
+---
+# Response
+GQCNNGrasp grasp

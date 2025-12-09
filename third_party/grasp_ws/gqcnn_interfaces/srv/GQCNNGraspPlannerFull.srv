@@ -1,0 +1,12 @@
+# GQCNNGraspPlannerFull service for grasp planning with all inputs
+# Copyright BSD-3-Clause
+
+# Request
+sensor_msgs/Image color_image
+sensor_msgs/Image depth_image
+sensor_msgs/CameraInfo camera_info
+BoundingBox bounding_box
+sensor_msgs/Image segmask
+---
+# Response
+GQCNNGrasp grasp

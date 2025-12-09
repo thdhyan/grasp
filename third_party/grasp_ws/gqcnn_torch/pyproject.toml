@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gqcnn_torch"
+version = "1.0.0"
+description = "PyTorch implementation of Grasp Quality Convolutional Neural Networks"
+readme = "README.md"
+license = {text = "BSD-3-Clause"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Based on Berkeley Autolab"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "scikit-image>=0.20.0",
+    "scikit-learn>=1.2.0",
+    "opencv-python>=4.7.0",
+    "pyyaml>=6.0",
+    "matplotlib>=3.7.0",
+    "autolab-core>=1.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+]
+ros = [
+    "rclpy",
+]
+
+[project.scripts]
+gqcnn_torch_policy = "gqcnn_torch.scripts.run_policy:main"
+gqcnn_torch_train = "gqcnn_torch.scripts.train:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+line_length = 88
