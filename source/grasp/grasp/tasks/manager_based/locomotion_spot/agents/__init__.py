@@ -3,9 +3,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Manager-based task environments."""
+"""Agent configurations for the manager-based locomotion spot environment."""
 
-import gymnasium as gym  # noqa: F401
-
-# Import sub-packages to register environments
-from . import locomotion_spot  # noqa: F401
+from .rsl_rl_ppo_cfg import LocomotionSpotPPORunnerCfg
+from .skrl_ppo_cfg import LocomotionSpotSkrlCfg

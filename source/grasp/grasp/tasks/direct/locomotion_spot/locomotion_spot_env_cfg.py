@@ -65,7 +65,7 @@ class LocomotionSpotEnvCfg(DirectRLEnvCfg):
     robot: ArticulationCfg = ArticulationCfg(
         prim_path="/World/envs/env_.*/Robot",
         spawn=sim_utils.UsdFileCfg(
-            usd_path="/home/thakk100/Projects/csci8551/grasp/assets/spot_arm_camera.usd",
+            usd_path="/home/thakk100/Projects/grasp/assets/spot_arm_camera.usd",
             activate_contact_sensors=True,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 disable_gravity=False,
@@ -128,7 +128,7 @@ class LocomotionSpotEnvCfg(DirectRLEnvCfg):
     chair: ArticulationCfg = ArticulationCfg(
         prim_path="/World/envs/env_.*/Chair",
         spawn=sim_utils.UsdFileCfg(
-            usd_path="/home/thakk100/Projects/csci8551/grasp/assets/office chair.usda",
+            usd_path="/home/thakk100/Projects/grasp/assets/office chair.usda",
             scale=(1.0, 1.0, 1.0),
         ),
         init_state=ArticulationCfg.InitialStateCfg(
