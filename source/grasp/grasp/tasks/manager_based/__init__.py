@@ -9,3 +9,4 @@ import gymnasium as gym  # noqa: F401
 
 # Import sub-packages to register environments
 from . import locomotion_spot  # noqa: F401
+from . import locomanipulation_spot  # noqa: F401
