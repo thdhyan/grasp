@@ -1,0 +1,22 @@
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+import gymnasium as gym
+
+from . import map_points
+
+##
+# Register Gym environments.
+##
+
+gym.register(
+    id="Template-Grasp-Heir-Teleop-v0",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.grasp_heir_teleop_env_cfg:GraspHeirTeleopEnvCfg",
+        "rsl_rl_cfg_entry_point": None, # No training
+    },
+)

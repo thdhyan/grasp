@@ -1,12 +1,14 @@
 import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg
 from isaaclab.actuators import ImplicitActuatorCfg
+import os
 
+USD_PATH = os.path.join(os.path.dirname(__file__), "spot_arm_01_colliders.usda")
 
 SPOT_CFG : ArticulationCfg = ArticulationCfg(
         prim_path="{ENV_REGEX_NS}/Robot",
         spawn=sim_utils.UsdFileCfg(
-            usd_path="/home/thakk100/Projects/ebasa/grasp_heir/source/grasp_heir/grasp_heir/assets/robots/spot_arm_01_colliders.usda",
+            usd_path=USD_PATH,
             activate_contact_sensors=True,
             scale=(1.0, 1.0, 1.0),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -27,9 +29,9 @@ SPOT_CFG : ArticulationCfg = ArticulationCfg(
             ),
         ),
         init_state=ArticulationCfg.InitialStateCfg(
-            pos=(0.0, 0.0, 0.0),
+            pos=(0.0, 0.0, 0.61),  # Spawn above ground (Spot body height ~0.5m)
             joint_pos={
-            #     ".*_hx": 0.0,
+                #".*_hx": 0.0,
                 ".*_hy": 0.9,
                 ".*_kn": -1.502,
                 "arm0_sh1": -1.309,
@@ -38,7 +40,7 @@ SPOT_CFG : ArticulationCfg = ArticulationCfg(
                 "arm0_wr0": 1.26,
                 "arm0_wr1": 0.0,
                 "arm0_f1x": -0.855,
-            #     # "arm0_f2x": -50.4,
+                #"arm0_f2x": -50.4,
             },
         ),
         actuators={
@@ -72,3 +74,4 @@ SPOT_CFG : ArticulationCfg = ArticulationCfg(
             ),
         },
     )
+
