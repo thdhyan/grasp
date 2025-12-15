@@ -5,3 +5,5 @@
 
 from .events import *
 from .rewards import *
+from .terminations import *
+from .curriculums import *

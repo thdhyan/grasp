@@ -21,7 +21,7 @@ SPOT_CFG : ArticulationCfg = ArticulationCfg(
                 max_depenetration_velocity=1.0,
             ),
             articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-                enabled_self_collisions=True,
+                enabled_self_collisions=False,
                 solver_position_iteration_count=4,
                 solver_velocity_iteration_count=0,
                 sleep_threshold=0.005,
@@ -29,7 +29,7 @@ SPOT_CFG : ArticulationCfg = ArticulationCfg(
             ),
         ),
         init_state=ArticulationCfg.InitialStateCfg(
-            pos=(0.0, 0.0, 0.61),  # Spawn above ground (Spot body height ~0.5m)
+            pos=(0.0, 0.0, 0.4),  # Spawn above ground (Spot body height ~0.5m)
             joint_pos={
                 #".*_hx": 0.0,
                 ".*_hy": 0.9,

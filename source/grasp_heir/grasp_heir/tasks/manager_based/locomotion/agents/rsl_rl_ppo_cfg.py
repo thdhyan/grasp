@@ -12,7 +12,7 @@ from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlPpoActorCriticCfg, R
 class SpotLocomotionPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
     max_iterations = 5000 # Just a high number, user can stop manually or it runs out
-    save_interval = 200 # If num_steps_per_env=24 * 4096 = ~100k steps/iter, 5000 steps is way less than 1 iter.
+    save_interval = 50 # If num_steps_per_env=24 * 4096 = ~100k steps/iter, 5000 steps is way less than 1 iter.
                         # User asked for "save policy every 5000 steps". 
                         # If they meant 5000 iterations: 5000.
                         # If they meant 5000 environment steps (global): that's super frequent.

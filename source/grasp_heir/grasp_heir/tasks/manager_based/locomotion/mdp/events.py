@@ -54,5 +54,28 @@ def randomize_arm_joint_positions(
     
     targets = default_pos + noise
     
-    # Set the targets
-    asset.set_joint_position_target(targets, env_ids=env_ids, joint_ids=joint_ids)
+
+def randomize_goal_pose(
+    env: ManagerBasedEnv,
+    env_ids: torch.Tensor,
+    position_range: tuple[float, float],
+):
+    """Randomize the goal position for the robot.
+    
+    This function generates a random 2D goal position within the specified range and sets it
+    in the environment's extras.
+    """
+    # check if 'goal' exists in extras, if not create it
+    if "goal" not in env.scene.extras:
+        # assume 2D goal (x, y)
+        env.scene.extras["goal"] = torch.zeros((env.num_envs, 2), device=env.device)
+        
+    # sample random positions
+    # range is (min, max) for both x and y
+    r_min, r_max = position_range
+    
+    # generate random x, y uniformly in [min, max]
+    random_goal = torch.rand((len(env_ids), 2), device=env.device) * (r_max - r_min) + r_min
+    
+    # update goals for reset envs
+    env.scene.extras["goal"][env_ids] = random_goal

@@ -56,27 +56,27 @@ class SpotLocomotionSceneCfg(InteractiveSceneCfg):
     contact_forces_fl = ContactSensorCfg(
         prim_path="{ENV_REGEX_NS}/Robot/spot_arm_01/fl_foot", 
         history_length=3, 
-        track_air_time=False
+        track_air_time=True
     )
     contact_forces_fr = ContactSensorCfg(
         prim_path="{ENV_REGEX_NS}/Robot/spot_arm_01/fr_foot", 
         history_length=3, 
-        track_air_time=False
+        track_air_time=True
     )
     contact_forces_hl = ContactSensorCfg(
         prim_path="{ENV_REGEX_NS}/Robot/spot_arm_01/hl_foot", 
         history_length=3, 
-        track_air_time=False
+        track_air_time=True
     )
     contact_forces_hr = ContactSensorCfg(
         prim_path="{ENV_REGEX_NS}/Robot/spot_arm_01/hr_foot", 
         history_length=3, 
-        track_air_time=False
+        track_air_time=True  # Enabled for termination check
     )
     contact_forces_body = ContactSensorCfg(
         prim_path="{ENV_REGEX_NS}/Robot/spot_arm_01/body", 
         history_length=3, 
-        track_air_time=False
+        track_air_time=False,
     ) # Body contact sensor for undesired contacts penalty
 ##
 # MDP settings
@@ -98,7 +98,7 @@ class CommandsCfg:
 class ActionsCfg:
     """Action specifications for the MDP."""
     # Joint efforts for legs
-    joint_efforts = mdp.JointEffortActionCfg(asset_name="robot", joint_names=[".*_hx", ".*_hy", ".*_kn"], scale=100.0)
+    joint_efforts = mdp.JointEffortActionCfg(asset_name="robot", joint_names=[".*_hx", ".*_hy", ".*_kn"], scale=10.0)
 
     # Arm is controlled via a dummy action (or just randomized events)
     # We define it here to prevent errors if we want to add it later, or we can leave it empty
@@ -171,6 +171,22 @@ class EventCfg:
                 "pitch": (-0.1, 0.1),
                 "yaw": (-0.1, 0.1),
             },
+            "velocity_range": {
+                "x": (-0.1, 0.1),
+                "y": (-0.1, 0.1),
+                "z": (-0.1, 0.1),
+                "roll": (-0.1, 0.1),
+                "pitch": (-0.1, 0.1),
+                "yaw": (-0.1, 0.1),
+            },
+            "pose_range": {
+                "x": (-0.0, 0.0), 
+                "y": (-0.0, 0.0), 
+                "z": (0.75, 0.75),  # Fix inverted spawn: spawn higher
+                "yaw": (-math.pi, math.pi),
+                "roll": (0.0, 0.0),
+                "pitch": (0.0, 0.0),
+            },
         },
     )
 
@@ -183,6 +199,14 @@ class EventCfg:
             "velocity_range": (0.0, 0.0),
         },
     )
+
+    # reset_goal = EventTerm(
+    #     func=local_mdp.randomize_goal_pose,
+    #     mode="reset",
+    #     params={
+    #         "position_range": (-1.0, 1.0), # Start small for curriculum
+    #     },
+    # )
 
     # interval - robustness
     push_robot = EventTerm(
@@ -222,15 +246,15 @@ class RewardsCfg:
     """Reward terms for the MDP."""
     # -- task --
     track_lin_vel_xy_exp = RewTerm(
-        func=mdp.track_lin_vel_xy_exp, weight=1.0, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
+        func=mdp.track_lin_vel_xy_exp, weight=1.5, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
     )
     track_ang_vel_z_exp = RewTerm(
-        func=mdp.track_ang_vel_z_exp, weight=0.5, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
+        func=mdp.track_ang_vel_z_exp, weight=1.0, params={"command_name": "base_velocity", "std": math.sqrt(0.25)}
     )
     # -- penalties --
     lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=-2.0)
     ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
-    dof_torques_l2 = RewTerm(func=mdp.joint_torques_l2, weight=-1.0e-5)
+    dof_torques_l2 = RewTerm(func=mdp.joint_torques_l2, weight=-0.0005)
     dof_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-7)
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-0.01)
 
@@ -258,7 +282,7 @@ class RewardsCfg:
     # Penalize body contacts (torso hitting ground = bad)
     undesired_contacts = RewTerm(
         func=mdp.undesired_contacts,
-        weight=-1.0,
+        weight=-0.1,
         params={"sensor_cfg": SceneEntityCfg("contact_forces_body"), "threshold": 1.0},
     )
 
@@ -277,22 +301,68 @@ class RewardsCfg:
         }
     )
 
-    # Penalize being slow when commanded to move
-    slow_approach_penalty = RewTerm(
-        func=local_mdp.velocity_tracking_slow_penalty,
-        weight=-1.0,
-        params={
-            "command_name": "base_velocity",
-            "asset_cfg": SceneEntityCfg("robot"),
-            "min_velocity_threshold": 0.1,
-        }
+    # -- New Rewards from User Request --
+    # track_goal = RewTerm(
+    #     func=local_mdp.track_goal_distance_exp,
+    #     weight=1.0,
+    #     params={"std": 1.0},
+    # )
+    
+    # base_height = RewTerm(
+    #     func=local_mdp.base_height_reward,
+    #     weight=1.0,
+    #     params={"min_height": 0.7, "max_height": 2.0},
+    # )
+
+    # Add a penalty for feet air time (copied from A1 but negative weight)
+    feet_air_time_penalty = RewTerm(
+        func=mdp.feet_air_time,
+        weight=-0.005,  # Moderate penalty for total air time
+        params={"sensor_cfg": SceneEntityCfg("contact_forces_fl"), "threshold": 0.05} # Or specific joint names/regex
     )
+
 
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
-    # Note: No base_contact termination since sensor only covers feet
+    
+    # Body contact
+    illegal_contact = DoneTerm(
+        func=mdp.illegal_contact,
+        params={"sensor_cfg": SceneEntityCfg("contact_forces_body"), "threshold": 1.0},
+    )
+    
+    # Feet air time > 5s
+    feet_air_time = DoneTerm(
+        func=local_mdp.feet_air_time_termination,
+        params={
+            "sensor_cfgs": [
+                SceneEntityCfg("contact_forces_fl"),
+                SceneEntityCfg("contact_forces_fr"),
+                SceneEntityCfg("contact_forces_hl"),
+                SceneEntityCfg("contact_forces_hr"),
+            ],
+            "time_threshold": 5.0,
+        },
+    )
+
+
+from isaaclab.managers import CurriculumTermCfg as CurrTerm
+
+@configclass
+class CurriculumCfg:
+    """Curriculum terms for the MDP."""
+    # goal_distance = CurrTerm(
+    #     func=local_mdp.goal_distance_curriculum,
+    #     params={
+    #         "term_name": "reset_goal", 
+    #         "start_dist": 1.0, 
+    #         "end_dist": 5.0, 
+    #         "total_steps": 1000, 
+    #     },
+    # )
+
 
 @configclass
 class SpotLocomotionEnvCfg(ManagerBasedRLEnvCfg):
@@ -307,6 +377,7 @@ class SpotLocomotionEnvCfg(ManagerBasedRLEnvCfg):
     rewards: RewardsCfg = RewardsCfg()
     terminations: TerminationsCfg = TerminationsCfg()
     events: EventCfg = EventCfg()
+    curriculum: CurriculumCfg = CurriculumCfg()
 
     def __post_init__(self):
         """Post initialization."""
@@ -318,3 +389,4 @@ class SpotLocomotionEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.render_interval = self.decimation
         self.sim.disable_contact_processing = True
         self.sim.physics_material = self.scene.terrain.spawn.physics_material
+

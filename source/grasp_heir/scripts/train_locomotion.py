@@ -16,15 +16,15 @@ from datetime import datetime
 
 # Set CUDA device before importing torch or isaaclab components
 # User requested CUDA_VISIBLE_DEVICES=3
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "3" # Removed to allow external configuration
 
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
 parser.add_argument("--video", action="store_true", default=False, help="Record videos during training.")
-parser.add_argument("--video_length", type=int, default=200, help="Length of the recorded video (in steps).")
-parser.add_argument("--video_interval", type=int, default=100, help="Interval between video recordings (in steps).")
+parser.add_argument("--video_length", type=int, default=10000, help="Length of the recorded video (in steps).")
+parser.add_argument("--video_interval", type=int, default=500, help="Interval between video recordings (in steps).")
 # If video_interval is 1000 steps, checking if RSL-RL wrapper supports it directly or we rely on the env config?
 # Isaac Lab's RSL-RL runner usually doesn't record videos during training by default unless configured.
 # We will use the standard arguments and pass them to the runner or env.

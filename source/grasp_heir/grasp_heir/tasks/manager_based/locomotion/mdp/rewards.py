@@ -125,3 +125,43 @@ def velocity_tracking_slow_penalty(
     )
     return penalty
 
+
+def track_goal_distance_exp(
+    env: ManagerBasedRLEnv,
+    std: float,
+    command_name: str = "base_velocity", # Not used but often required by signature matching if generic
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """Reward tracking the goal position.
+    
+    Reward is exponential of the distance to the goal.
+    """
+    # Get goal position (x, y)
+    goal = env.scene.extras["goal"]
+    
+    # Get robot position (x, y)
+    asset = env.scene[asset_cfg.name]
+    pos = asset.data.root_pos_w[:, :2]
+    
+    # Compute distance
+    dist = torch.norm(pos - goal, dim=-1)
+    
+    return torch.exp(-dist / std)
+
+
+def base_height_reward(
+    env: ManagerBasedRLEnv,
+    min_height: float = 0.7,
+    max_height: float = 2.0,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """Reward for keeping base height within a range.
+    
+    Returns 1.0 if base height is within [min_height, max_height], 0.0 otherwise.
+    """
+    asset = env.scene[asset_cfg.name]
+    # base height is z component of root position
+    height = asset.data.root_pos_w[:, 2]
+    
+    in_range = (height > min_height) & (height < max_height)
+    return in_range.float()
