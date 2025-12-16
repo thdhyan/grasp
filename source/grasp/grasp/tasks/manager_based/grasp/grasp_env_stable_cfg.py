@@ -3,10 +3,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 """
-Spot Grasp Environment Configuration
+Spot Grasp Environment Configuration (Stable Variant)
 
-Complete standalone environment configuration based on env.yaml.
-Includes body camera and wrist camera, and supports loading pre-trained policy.
+Complete standalone environment configuration based on env.yaml with stabilization improvements.
 """
 
 import math
@@ -114,7 +113,7 @@ SPOT_ARM_CFG = ArticulationCfg(
             joint_names_expr=[".*_h[xy]"],
             effort_limit=45.0,
             stiffness=60.0,
-            damping=1.5,
+            damping=5.0, # Increased damping
             friction=0.05,
             min_delay=0,
             max_delay=4,
@@ -123,7 +122,7 @@ SPOT_ARM_CFG = ArticulationCfg(
             joint_names_expr=[".*_kn"],
             effort_limit=45.0,
             stiffness=60.0,
-            damping=1.5,
+            damping=5.0, # Increased damping
             friction=0.05,
             min_delay=0,
             max_delay=4,
@@ -132,7 +131,7 @@ SPOT_ARM_CFG = ArticulationCfg(
             joint_names_expr=["arm0_sh1"],
             effort_limit=181.8,
             stiffness=60.0,
-            damping=1.5,
+            damping=5.0, # Increased damping
             friction=0.05,
             min_delay=0,
             max_delay=4,
@@ -141,7 +140,7 @@ SPOT_ARM_CFG = ArticulationCfg(
             joint_names_expr=["arm0_el0"],
             effort_limit=90.9,
             stiffness=60.0,
-            damping=1.5,
+            damping=5.0, # Increased damping
             friction=0.05,
             min_delay=0,
             max_delay=4,
@@ -150,7 +149,7 @@ SPOT_ARM_CFG = ArticulationCfg(
             joint_names_expr=["arm0_el1"],
             effort_limit=30.3,
             stiffness=60.0,
-            damping=1.5,
+            damping=5.0, # Increased damping
             friction=0.05,
             min_delay=0,
             max_delay=4,
@@ -159,7 +158,7 @@ SPOT_ARM_CFG = ArticulationCfg(
             joint_names_expr=["arm0_sh0"],
             effort_limit=90.3,
             stiffness=60.0,
-            damping=1.5,
+            damping=5.0, # Increased damping
             friction=0.05,
             min_delay=0,
             max_delay=4,
@@ -168,7 +167,7 @@ SPOT_ARM_CFG = ArticulationCfg(
             joint_names_expr=["arm0_wr0"],
             effort_limit=30.3,
             stiffness=60.0,
-            damping=1.5,
+            damping=5.0, # Increased damping
             friction=0.05,
             min_delay=0,
             max_delay=4,
@@ -177,7 +176,7 @@ SPOT_ARM_CFG = ArticulationCfg(
             joint_names_expr=["arm0_wr1"],
             effort_limit=30.3,
             stiffness=60.0,
-            damping=1.5,
+            damping=5.0, # Increased damping
             friction=0.05,
             min_delay=0,
             max_delay=4,
@@ -186,7 +185,7 @@ SPOT_ARM_CFG = ArticulationCfg(
             joint_names_expr=["arm0_f1x"],
             effort_limit=15.32,
             stiffness=60.0,
-            damping=1.5,
+            damping=5.0, # Increased damping
             friction=0.05,
             min_delay=0,
             max_delay=4,
@@ -199,8 +198,8 @@ SPOT_ARM_CFG = ArticulationCfg(
 # Scene Configuration
 ##
 @configclass
-class SpotGraspSceneCfg(InteractiveSceneCfg):
-    """Scene configuration for Spot Grasp environment with cameras."""
+class SpotGraspStableSceneCfg(InteractiveSceneCfg):
+    """Scene configuration for Spot Grasp Stable environment with cameras."""
 
     # Ground/Terrain
     terrain = TerrainImporterCfg(
@@ -236,48 +235,6 @@ class SpotGraspSceneCfg(InteractiveSceneCfg):
         force_threshold=1.0,
     )
 
-    # Body Camera - attached to /body with x=0.4, rotation (90, -90, 0) degrees
-    # Commented out for faster startup - uncomment when needed
-    # body_camera = CameraCfg(
-    #     prim_path="{ENV_REGEX_NS}/Robot/body/body_camera",
-    #     update_period=0.1,
-    #     height=480,
-    #     width=640,
-    #     data_types=["rgb", "depth"],
-    #     spawn=sim_utils.PinholeCameraCfg(
-    #         focal_length=24.0,
-    #         focus_distance=400.0,
-    #         horizontal_aperture=20.955,
-    #         clipping_range=(0.1, 100.0),
-    #     ),
-    #     offset=CameraCfg.OffsetCfg(
-    #         pos=(0.4, 0.0, 0.0),
-    #         rot=(0.5, -0.5, 0.5, -0.5),
-    #         convention="ros",
-    #     ),
-    # )
-
-    # Wrist Camera - attached to arm0_link_wr1 with x=0.14, rotation (90, -90, 0) degrees
-    # Commented out for faster startup - uncomment when needed
-    # wrist_camera = CameraCfg(
-    #     prim_path="{ENV_REGEX_NS}/Robot/arm0_link_wr1/wrist_camera",
-    #     update_period=0.1,
-    #     height=480,
-    #     width=640,
-    #     data_types=["rgb", "depth"],
-    #     spawn=sim_utils.PinholeCameraCfg(
-    #         focal_length=24.0,
-    #         focus_distance=400.0,
-    #         horizontal_aperture=20.955,
-    #         clipping_range=(0.1, 100.0),
-    #     ),
-    #     offset=CameraCfg.OffsetCfg(
-    #         pos=(0.14, 0.0, 0.0),
-    #         rot=(0.5, -0.5, 0.5, -0.5),
-    #         convention="ros",
-    #     ),
-    # )
-
     # Sky light
     sky_light = AssetBaseCfg(
         prim_path="/World/skyLight",
@@ -301,19 +258,6 @@ class SpotActionsCfg:
         scale=0.2,
         use_default_offset=True,
     )
-
-    # pretrained_policy = local_mdp.PreTrainedPolicyActionCfg(
-    #     asset_name="robot",
-    #     policy_path="/home/thakk100/Projects/grasp/logs/rsl_rl/spot_grasp/2025-12-15_19-05-13/model_1250.pt",
-    #     low_level_decimation=4,
-    #     # low_level_actions=mdp.JointPositionActionCfg(
-    #     #     asset_name="robot",
-    #     #     joint_names=[".*"],
-    #     #     scale=0.2,
-    #     #     use_default_offset=True,
-    #     # ),
-    #     # low_level_observations=SpotObservationsCfg.PolicyCfg(),
-    # )
 
 
 ##
@@ -435,12 +379,12 @@ class SpotEventCfg:
             "asset_cfg": SceneEntityCfg("robot"),
             "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
             "velocity_range": {
-                "x": (-1.5, 1.5),
-                "y": (-1.0, 1.0),
+                "x": (-0.5, 0.5),
+                "y": (-0.5, 0.5),
                 "z": (-0.5, 0.5),
-                "roll": (-0.7, 0.7),
-                "pitch": (-0.7, 0.7),
-                "yaw": (-1.0, 1.0),
+                "roll": (-0.5, 0.5),
+                "pitch": (-0.5, 0.5),
+                "yaw": (-0.5, 0.5),
             },
         },
     )
@@ -450,7 +394,7 @@ class SpotEventCfg:
         mode="reset",
         params={
             "position_range": (-0.2, 0.2),
-            "velocity_range": (-2.5, 2.5),
+            "velocity_range": (0.0, 0.0),
             "asset_cfg": SceneEntityCfg("robot"),
         },
     )
@@ -483,7 +427,7 @@ class SpotEventCfg:
         interval_range_s=(10.0, 15.0),
         params={
             "asset_cfg": SceneEntityCfg("robot"),
-            "velocity_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5)},
+            "velocity_range": {"x": (-0.1, 0.1), "y": (-0.1, 0.1)}, # Reduced push velocity
         },
     )
 
@@ -560,7 +504,7 @@ class SpotRewardsCfg:
     )
     action_smoothness = RewardTermCfg(
         func=spot_mdp.action_smoothness_penalty,
-        weight=-1.0,
+        weight=-0.1, # Reduced from -1.0 per user request
     )
     air_time_variance = RewardTermCfg(
         func=spot_mdp.air_time_variance_penalty,
@@ -574,13 +518,13 @@ class SpotRewardsCfg:
     )
     base_orientation = RewardTermCfg(
         func=spot_mdp.base_orientation_penalty,
-        weight=-4.0,
+        weight=-1.0, # Adjusted per user request
         params={"asset_cfg": SceneEntityCfg("robot")},
     )
     
     base_height_l2 = RewardTermCfg(
         func=base_mdp.base_height_l2,
-        weight=-3.0, # Penalty for deviation
+        weight=-1.0, # Reduced penalty
         params={
             "target_height": 0.75,
             "asset_cfg": SceneEntityCfg("robot"),
@@ -640,12 +584,12 @@ class SpotRewardsCfg:
     # Survival reward to encourage longer episodes
     is_alive = RewardTermCfg(
         func=mdp.is_alive,
-        weight=2.0,
+        weight=100.0, # Heavily boosted for stability
     )
 
     illegal_contacts_penalty = RewardTermCfg(
         func=mdp.undesired_contacts,
-        weight=-100.0,
+        weight=-100.0, # Increased penalty
         params={
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["body", ".*leg"]),
             "threshold": 5.0,
@@ -654,7 +598,7 @@ class SpotRewardsCfg:
 
     termination_penalty = RewardTermCfg(
         func=mdp.is_terminated,
-        weight=-200.0,
+        weight=-200.0, # Increased penalty
     )  
 
 
@@ -701,31 +645,19 @@ class SpotCurriculumCfg:
 # Main Environment Configuration
 ##
 @configclass
-class SpotGraspEnvCfg(ManagerBasedRLEnvCfg):
+class SpotGraspStableEnvCfg(ManagerBasedRLEnvCfg):
     """
-    Complete standalone configuration for Spot Grasp Environment.
+    Complete standalone configuration for Spot Grasp Environment (Stable Variant).
     
     Based on env.yaml with cameras added for body and wrist.
     Pre-trained policy can be loaded from: {POLICY_DIR}/spot_arm_policy.pt
     """
 
     # Scene
-    scene: SpotGraspSceneCfg = SpotGraspSceneCfg(num_envs=4096, env_spacing=2.5)
+    scene: SpotGraspStableSceneCfg = SpotGraspStableSceneCfg(num_envs=4096, env_spacing=2.5)
 
     # Basic settings
     observations: SpotObservationsCfg = SpotObservationsCfg()
-    # actions: local_mdp.PreTrainedPolicyActionCfg = local_mdp.PreTrainedPolicyActionCfg(
-    #     asset_name="robot",
-    #     policy_path="/home/thakk100/Projects/grasp/logs/rsl_rl/spot_grasp/2025-12-15_19-05-13/model_1250.pt",
-    #     low_level_decimation=4,
-    #     low_level_actions=mdp.JointPositionActionCfg(
-    #         asset_name="robot",
-    #         joint_names=[".*"],
-    #         scale=0.2,
-    #         use_default_offset=True,
-    #     ),
-    #     low_level_observations=SpotObservationsCfg.PolicyCfg(),
-    # )
     actions: SpotActionsCfg = SpotActionsCfg()
     commands: SpotCommandsCfg = SpotCommandsCfg()
 
@@ -770,7 +702,7 @@ class SpotGraspEnvCfg(ManagerBasedRLEnvCfg):
 # Flat Terrain Variant
 ##
 @configclass
-class SpotGraspEnvFlatCfg(SpotGraspEnvCfg):
+class SpotGraspStableEnvFlatCfg(SpotGraspStableEnvCfg):
     """Configuration for Spot on flat terrain."""
 
     def __post_init__(self):
@@ -788,7 +720,7 @@ class SpotGraspEnvFlatCfg(SpotGraspEnvCfg):
 # Play/Evaluation Configuration
 ##
 @configclass
-class SpotGraspEnvCfg_PLAY(SpotGraspEnvFlatCfg):
+class SpotGraspStableEnvCfg_PLAY(SpotGraspStableEnvFlatCfg):
     """Configuration for evaluation/play mode."""
 
     def __post_init__(self):
@@ -798,23 +730,3 @@ class SpotGraspEnvCfg_PLAY(SpotGraspEnvFlatCfg):
         self.scene.num_envs = 50
         self.scene.env_spacing = 2.5
         self.scene.terrain.max_init_terrain_level = None
-
-        # Disable observation noise
-        self.observations.policy.enable_corruption = False
-
-        # Disable disturbances
-        self.events.base_external_force_torque = None
-        self.events.push_robot = None
-
-
-##
-# Policy Loading Helper
-##
-def get_pretrained_policy_path() -> str:
-    """Returns the path to the pre-trained policy."""
-    return str(POLICY_DIR / "model_999.pt")
-
-
-def get_env_yaml_path() -> str:
-    """Returns the path to the env.yaml file."""
-    return str(POLICY_DIR / "env.yaml")

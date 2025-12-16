@@ -7,4 +7,7 @@
 
 from isaaclab.envs.mdp import *  # noqa: F401, F403
 
+from isaaclab_tasks.manager_based.navigation.mdp import *
+
 from .rewards import *  # noqa: F401, F403
+from .terminations import *  # noqa: F401, F403
